@@ -29,6 +29,4 @@ export function Navigation ( props ) {
     else {
         return null
     }
-
-    
 }
