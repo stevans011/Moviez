@@ -14,14 +14,13 @@ export function Home(props) {
     const itemCollection = pageData.map(( item, key ) => {
       return (
         <div className="col-md-4" key={key}>
-          <div className="card">
-            <div className="card-body">
-            <img className="movie-image" src={item.ImageUrl} height="100px"/>
+          <div>
+            <div className="card-body text-center shadow p-3 mb-5 bg-body rounded">
+            <img className="rounded" src={item.ImageUrl} height="250px"/>
               <h5 className="card-title">{item.Title}</h5>
+              <span className="text-secondary">
               <Link to={"/details/" + item.id}>Detail</Link> 
-
-              
-              
+              </span>
             </div>
           </div>
         </div>
