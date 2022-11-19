@@ -10,6 +10,9 @@ import { About } from './pages/About'
 import { Signup } from './pages/Signup'
 import { Signout } from './pages/Signout'
 import { Signin } from './pages/Signin'
+import { Details } from './pages/Details'
+
+
 
 // import firebase
 import { initializeApp } from "firebase/app"
@@ -18,7 +21,9 @@ import { FirebaseConfig } from './config/FirebaseConfig'
 import { 
   getFirestore, 
   getDocs, 
-  collection 
+  collection,
+  doc,
+  getDoc
 } from "firebase/firestore";
 // import firebase auth 
 import {
@@ -118,11 +123,20 @@ function App() {
       dbItems.push( item )
     })
     setData( dbItems )
-    //console.log( dbItems )
+    console.log( dbItems )
     // return dbItems
   }
 
-  
+  const getDocument = async ( col, id ) => {
+    const docRef = doc( FBdb, col, id )
+    const docData = await getDoc( docRef )
+    if( docData.exists() ) {
+      return docData.data()
+    }
+    else {
+      return null
+    }
+  }
 
   return (
     <div className="App">
@@ -134,6 +148,7 @@ function App() {
         <Route path="/signup" element={<Signup handler={signup} />} />
         <Route path="/signout" element={<Signout handler={signoutuser} auth={auth} />} />
         <Route path="/signin" element={<Signin handler={signin} />} />
+        <Route path="/movie/:movieId" element={<Details getter={ getDocument} />} />
       </Routes>
       <Footer year="2022" />
     </div>
