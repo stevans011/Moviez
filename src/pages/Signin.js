@@ -32,7 +32,11 @@ export function Signin(props) {
     <div className="container">
       <div className="row">
         <form className="col-md-4 offset-md-4" onSubmit={submitHandler} >
-          <h2 className='signin-title'>Sign in to your account</h2>
+          {/* Toggle button */}
+          <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span className="navbar-toggler-icon"></span>
+          </button>
+          <h2 className="text-center">Sign in to your account</h2>
           <div className="mb-3">
             <label htmlFor="useremail">Email </label>
             <input
@@ -59,7 +63,7 @@ export function Signin(props) {
           <div className="d-grid">
             <button
               type="submit"
-              className="btn btn-primary"
+              className="btn btn-outline-danger"
             >
              Sign in
             </button>
@@ -69,7 +73,7 @@ export function Signin(props) {
       </div>
       <div className="row">
         <div className="col text-center">
-          <Link className="btn btn-link" to="/signup">Create an account</Link>
+          <Link className="link-danger" to="/signup">Create an account</Link>
         </div>
       </div>
     </div>

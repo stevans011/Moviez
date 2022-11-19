@@ -2,15 +2,22 @@ import { useState, useEffect } from 'react'
 import './App.css';
 import { Header } from './components/Header'
 import { Footer } from './components/Footer'
+
 import { Routes, Route } from 'react-router-dom';
+
 // import page components
 import { Home } from './pages/Home'
-import { Contact } from './pages/Contact'
-import { About } from './pages/About'
+
 import { Signup } from './pages/Signup'
 import { Signout } from './pages/Signout'
 import { Signin } from './pages/Signin'
 import { Details } from './pages/Details'
+
+//updates DW
+import { Experiences } from './pages/Experiences'
+import { Deals } from './pages/Deals'
+import { Cinema } from './pages/Cinema'
+import { Cart } from './pages/Cart'
 
 
 
@@ -18,9 +25,9 @@ import { Details } from './pages/Details'
 import { initializeApp } from "firebase/app"
 import { FirebaseConfig } from './config/FirebaseConfig'
 // import firebase firestore
-import { 
-  getFirestore, 
-  getDocs, 
+import {
+  getFirestore,
+  getDocs,
   collection,
   doc,
   getDoc
@@ -55,12 +62,12 @@ const signup = (email, password) => {
   })
 }
 
-const signin = (email, password ) => {
-  return new Promise( ( resolve, reject ) => {
-    signInWithEmailAndPassword( FBauth, email, password )
-      .then((userCredential) => resolve(userCredential.user) )
-      .catch( (error) => reject(error) )
-  } )
+const signin = (email, password) => {
+  return new Promise((resolve, reject) => {
+    signInWithEmailAndPassword(FBauth, email, password)
+      .then((userCredential) => resolve(userCredential.user))
+      .catch((error) => reject(error))
+  })
 }
 
 const signoutuser = () => {
@@ -72,31 +79,35 @@ const signoutuser = () => {
 
 }
 
-const NavData = [
-  { name: "Home", path: "/", public: true },
-  { name: "About", path: "/about", public: true },
-  { name: "Contact", path: "/contact", public: true },
-  { name: "Sign Up", path: "/signup", public: true },
-  { name: "Sign in", path: "/signin", public: true }
+const RightNavData = [
+  { name: "Cinema", path: "/cinema", icon: "fa-solid fa-map-location-dot", public: true },
+  { name: "Cart", path: "/cart", icon: "fa-solid fa-cart-shopping", public: true },
+  { name: "Sign In", path: "/signin", icon: "fa-solid fa-user", public: true }
+]
+
+const LeftNavData = [
+  { name: "Movies", path: "/", public: true },
+  { name: "Experiences", path: "/experiences", public: true },
+  { name: "Deals", path: "/deals", public: true }
 ]
 
 const NavDataAuth = [
-  { name: "Home", path: "/", public: true },
-  { name: "About", path: "/about", public: true },
-  { name: "Contact", path: "/contact", public: true },
-  { name: "Sign out", path: "/signout", public: true }
+  { name: "Cinema", path: "/cinema", icon: "fa-solid fa-map-location-dot", public: true },
+  { name: "Cart", path: "/cart", icon: "fa-solid fa-cart-shopping", public: true },
+  { name: "Sign Out", path: "/signout", icon: "fa-solid fa-user", public: true }
 ]
 
 function App() {
   const [auth, setAuth] = useState()
-  const [nav, setNav] = useState(NavData)
-  const [ data, setData ] = useState([])
+  const [rightNav, setRightNav] = useState(RightNavData)
+  const [leftNav, setLeftNav] = useState(LeftNavData)
+  const [data, setData] = useState([])
 
-  useEffect( () => {
-    if( data.length == 0 ) {
+  useEffect(() => {
+    if (data.length == 0) {
       getDataCollection('movies')
     }
-  } )
+  })
 
   // an observer to determine user's authentication status
   onAuthStateChanged(FBauth, (user) => {
@@ -104,33 +115,35 @@ function App() {
       // visitor is authenticated
       // console.log(user)
       setAuth(user)
-      setNav(NavDataAuth)
+      setLeftNav(LeftNavData)
+      setRightNav(NavDataAuth)
     }
     else {
       // if user is null means visitor is not authenticated
       // console.log('not signed in')
       setAuth(null)
-      setNav(NavData)
+      setLeftNav(LeftNavData)
+      setRightNav(RightNavData)
     }
   })
 
-  const getDataCollection = async ( path ) => {
-    const collectionData = await getDocs( collection(FBdb, path ) )
+  const getDataCollection = async (path) => {
+    const collectionData = await getDocs(collection(FBdb, path))
     let dbItems = []
-    collectionData.forEach( (doc) => {
+    collectionData.forEach((doc) => {
       let item = doc.data()
       item.id = doc.id
-      dbItems.push( item )
+      dbItems.push(item)
     })
-    setData( dbItems )
-    console.log( dbItems )
+    setData(dbItems)
+    console.log(dbItems)
     // return dbItems
   }
 
-  const getDocument = async ( col, id ) => {
-    const docRef = doc( FBdb, col, id )
-    const docData = await getDoc( docRef )
-    if( docData.exists() ) {
+  const getDocument = async (col, id) => {
+    const docRef = doc(FBdb, col, id)
+    const docData = await getDoc(docRef)
+    if (docData.exists()) {
       return docData.data()
     }
     else {
@@ -140,15 +153,17 @@ function App() {
 
   return (
     <div className="App">
-      <Header title="My app" headernav={nav} />
+      <Header title="BRAND" rightnav={rightNav} leftnav={leftNav} />
       <Routes>
-        <Route path="/" element={<Home listData={ data } />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
+        <Route path="/" element={<Home listData={data} />} />
         <Route path="/signup" element={<Signup handler={signup} />} />
         <Route path="/signout" element={<Signout handler={signoutuser} auth={auth} />} />
         <Route path="/signin" element={<Signin handler={signin} />} />
-        <Route path="/movie/:movieId" element={<Details getter={ getDocument} />} />
+        <Route path="/movie/:movieId" element={<Details getter={getDocument} />} />
+        <Route path="/experiences" element={<Experiences />} />
+        <Route path="/deals" element={<Deals />} />
+        <Route path="/cinema" element={<Cinema />} />
+        <Route path="/cart" element={<Cart />} />
       </Routes>
       <Footer year="2022" />
     </div>

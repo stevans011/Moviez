@@ -31,8 +31,8 @@ export function Signup(props) {
     }
   }, [password])
 
-  useEffect( () => {
-    if(success) {
+  useEffect(() => {
+    if (success) {
       navigate('/')
     }
   }, [success])
@@ -63,8 +63,12 @@ export function Signup(props) {
   return (
     <div className="container">
       <div className="row">
+        {/* Toggle button */}
+        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span className="navbar-toggler-icon"></span>
+        </button>
         <form className="col-md-4 offset-md-4" onSubmit={submitHandler}>
-          <h2>Sign up for an account</h2>
+          <h2 className="text-center">Sign up for an account</h2>
           <div className="mb-3">
             <label htmlFor="useremail">Email (valid email address) </label>
             <input
@@ -92,7 +96,7 @@ export function Signup(props) {
           <div className="d-grid">
             <button
               type="submit"
-              className="btn btn-primary"
+              className="btn btn-outline-danger"
               disabled={(validEmail && validPassword) ? false : true}
             >
               Sign up
@@ -103,7 +107,7 @@ export function Signup(props) {
       </div>
       <div className="row">
         <div className="col text-center">
-          <Link className="btn btn-link" to="/signin">Sign in to your account</Link>
+          <Link className="link-danger" to="/signin">Sign in to your account</Link>
         </div>
       </div>
     </div>
