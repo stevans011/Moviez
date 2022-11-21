@@ -11,7 +11,6 @@ export function Details ( props ) {
             props.getter("movies", movieId)
            
             .then( (data) => {
-                console.log(movieId);
                 setmovieData(data)
             } )
         }
@@ -19,30 +18,58 @@ export function Details ( props ) {
    
    
     if( movieData ) {
+        const reviewCollection = movieData.reviews?.map(( item, key ) => {
+            return (
+              <div className="col-md-4 review-container" key={key}>
+                
+                <div>Ratings: {item.Ratings}/10</div>
+                <div>{item.Description}</div>
+                <div className="review-item-user">{item.User}</div> 
+                
+            </div>
+            )
+          })
     return(
         <div className="container my-4">
             <div className="row">
-                <div className="col">
-                <img className="movie-image" src={movieData.ImageUrl} height="100px"/>
+                <div className="col-4">
+                <img className="movie-image" src={movieData.ImageUrl} height="500px"/>   
+                </div>
+
+                <div className="col-8 movie-details-container">
                     <h2>{ movieData.Title }</h2>
-                </div>
-            </div>
-            <div className="row">
-                <div className="col">
-                    <h2>{movieId}</h2>
-                    <h3>movie cover image</h3>
-                </div>
-                <div className="col">
-                    <h3>Year</h3>
-                    {movieData.Year}
-                    <h3>Description</h3>
+                    <h4>Year: {movieData.Year}</h4>
+                    <h4>Description</h4>
                     {movieData.Description}
-                    <button className="btn btn-info">Add to Favouries</button>
-                    <button className="btn btn-info">Review this book</button>
-                   
+                    <hr></hr>
+                    <button className="btn btn-info btn-movie-detail-action">Add to Favouries</button>
+
+                    <a href="#addreview">
+                    <button className="btn btn-info btn-movie-detail-action">Review this movie</button></a>
+                    <br/><br/>
+                    <h4>Reviews</h4>
+                    {reviewCollection}
+
+                    <div className="review-form" id="addreview"> 
+                    
+                    <h3>Write your review </h3>
+                    <form>
+        
+                        Ratings: <input type= "text" name="input-ratings"></input> <br/> <br/> 
+                        Description: <input type= "text" name="input-description"></input> <br/> <br/> 
+                        User: <input type= "text" name="input-user"></input> <br/><br/>  
+                        <button className="btn btn-info btn-movie-detail-action">Add Review </button>
+
+
+
+
+                    </form>
+                    
+                    </div>
                 </div>
-            </div>
+                </div>
         </div>
+        
     )
     }
     else {

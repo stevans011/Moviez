@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import banner  from '../images/banner.jpg'
+
 import {Link} from 'react-router-dom'
 
 
-export function Home(props) {
+export function Movies(props) {
   const [pageData, setPageData] = useState([])
 
   useEffect(() => {
@@ -29,10 +29,8 @@ export function Home(props) {
 
     return (
       <div className="container my-4">
-        <div className="banner">
-        <img src={banner} ></img>
-        </div>
-        <h1> Featured Movies </h1>
+       
+        <h1> All Movies </h1>
         <div className="row">
           {itemCollection}
         </div>

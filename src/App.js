@@ -41,6 +41,7 @@ import {
   signOut
 }
   from "firebase/auth"
+import { Movies } from './pages/Movies';
 
 // initialise Firebase
 const FBapp = initializeApp(FirebaseConfig)
@@ -86,7 +87,7 @@ const RightNavData = [
 ]
 
 const LeftNavData = [
-  { name: "Movies", path: "/", public: true },
+  { name: "Movies", path: "/Movies", public: true },
   { name: "Experiences", path: "/experiences", public: true },
   { name: "Deals", path: "/deals", public: true }
 ]
@@ -129,6 +130,7 @@ function App() {
 
   const getDataCollection = async (path) => {
     const collectionData = await getDocs(collection(FBdb, path))
+
     let dbItems = []
     collectionData.forEach((doc) => {
       let item = doc.data()
@@ -136,15 +138,28 @@ function App() {
       dbItems.push(item)
     })
     setData(dbItems)
-    console.log(dbItems)
+    
     // return dbItems
   }
 
+  
+//db.collection("app").document("users").collection(uid).document("notifications")
+
   const getDocument = async (col, id) => {
+
     const docRef = doc(FBdb, col, id)
     const docData = await getDoc(docRef)
     if (docData.exists()) {
-      return docData.data()
+    const collectionData = await getDocs(collection(FBdb, `movies/${id}/reviews`))
+    let dbItems = []
+    let movieData = docData.data();
+    collectionData.forEach((doc) => {
+      let item = doc.data()
+      item.id = doc.id
+      dbItems.push(item)
+    })
+      movieData.reviews = dbItems;
+      return movieData
     }
     else {
       return null
@@ -156,6 +171,8 @@ function App() {
       <Header title="BRAND" rightnav={rightNav} leftnav={leftNav} />
       <Routes>
         <Route path="/" element={<Home listData={data} />} />
+        <Route path="/movies" element={<Movies listData={data} />} />
+
         <Route path="/signup" element={<Signup handler={signup} />} />
         <Route path="/signout" element={<Signout handler={signoutuser} auth={auth} />} />
         <Route path="/signin" element={<Signin handler={signin} />} />
