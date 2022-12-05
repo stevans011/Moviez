@@ -159,6 +159,7 @@ function App() {
       dbItems.push(item)
     })
       movieData.reviews = dbItems;
+      console.log(movieData)
       return movieData
     }
     else {

@@ -1,3 +1,6 @@
+body {
+  background-color: rgb(226, 226, 226) !important;
+}
 .App {
   display: grid;
   grid-template-rows: auto 1fr auto;
@@ -22,9 +25,26 @@
   font-weight: bold;
   
 }
-
-
 .review-form{
 
   margin-top: 20px;
 }
+.links-container{
+  padding:8px;
+}
+
+.links-item{
+  padding: 0 ;
+}
+
+.genre-container {
+  margin: 8px 8px 8px 0px;
+}
+.genre-item {
+  margin-right: 8px;
+  margin-bottom: 16px;
+  padding: 8px;
+  border: 1px solid gray;
+  border-radius: 10px;
+}
+
