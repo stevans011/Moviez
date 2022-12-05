@@ -41,9 +41,7 @@ export function Details ( props ) {
 
           const genre = movieData.genre?.map(( item ) => {
             return (
-            
               <span className="col-md-4 genre-item"> {item}</span>
-              
             )
           })
     return(

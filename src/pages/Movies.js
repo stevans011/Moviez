@@ -16,7 +16,7 @@ export function Movies(props) {
         <div className="col-md-4" key={key}>
           <div>
             <div className="card-body text-center shadow p-3 mb-5 bg-body rounded">
-            <img className="rounded" src={item.ImageUrl} height="250px"/>
+            <Link to={"/movie/" + item.id}><img className="rounded" src={item.ImageUrl} height="250px"/></Link> 
               <h5 className="card-title">{item.Title}</h5>
               <span className="text-secondary">
               <Link to={"/movie/" + item.id}>Detail</Link> 
@@ -27,12 +27,32 @@ export function Movies(props) {
       )
     })
 
+    const genre = pageData.map(( item, key ) => {
+      const mySet = new Set([
+        item.genre
+      ]);
+      // item.genre.map(( i ) => {
+      return (
+        <div className="col-md-4" key={key}>
+          {mySet}
+        </div>
+      )
+    })
+
     return (
       <div className="container my-4">
        
         <h1> All Movies </h1>
         <div className="row">
-          {itemCollection}
+          <div className='col-2 filter-section'>
+            <h3>Filters</h3>
+            {genre}
+          </div> 
+          <div className='col-8'>
+          <div className="row">
+                {itemCollection}
+                </div>
+          </div>
         </div>
       </div>
     )

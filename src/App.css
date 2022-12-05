@@ -48,3 +48,13 @@ body {
   border-radius: 10px;
 }
 
+.filter-section {
+  background-color: white;
+  padding: 8px;
+  margin-right: 24px;
+  max-height: 400px;
+}
+
+.filter-section h3{
+  padding: 8px;
+}
