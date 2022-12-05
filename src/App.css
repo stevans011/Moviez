@@ -50,11 +50,30 @@ body {
 
 .filter-section {
   background-color: white;
-  padding: 8px;
   margin-right: 24px;
   max-height: 400px;
 }
 
 .filter-section h3{
+  text-align: center;
+  background-color: black;
+  padding: 0 !important;
+  color: white;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+.filter-link{
   padding: 8px;
+  color: #444;
+  text-decoration: none;
+  padding-bottom: 18px;
+}
+.filter-link-clear{
+  font-weight: bold;
+  text-align: right;
+  font-size: 10pt;
+  padding: 8px;
+  color: #444;
+  text-decoration: none;
+  padding-bottom: 18px;
 }

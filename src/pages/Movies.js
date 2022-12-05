@@ -1,15 +1,38 @@
 import { useState, useEffect } from 'react'
 
 import {Link} from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 
 
 export function Movies(props) {
   const [pageData, setPageData] = useState([])
+  const [filterData, setFilterData] = useState([])
+  const [searchParams, setSearchParams] = useSearchParams()
 
   useEffect(() => {
-    setPageData(props.listData)
+    setPageData(filter(props.listData))
+    setFilterData(props.filterData)
   })
-   
+
+  function filter(data) {
+    let filteredData = [];
+    const query = searchParams.get('genre');
+    if(!query) {
+      return data;
+    }
+    data.forEach(item => {
+      if(item.genre){
+        item.genre.forEach(g => {
+          console.log(g);
+          if(g === query){
+            filteredData.push(item);
+          }
+        });
+      }
+    });
+    return filteredData;
+  }
+
   if (pageData.length > 0) {
     const itemCollection = pageData.map(( item, key ) => {
       return (
@@ -19,7 +42,7 @@ export function Movies(props) {
             <Link to={"/movie/" + item.id}><img className="rounded" src={item.ImageUrl} height="250px"/></Link> 
               <h5 className="card-title">{item.Title}</h5>
               <span className="text-secondary">
-              <Link to={"/movie/" + item.id}>Detail</Link> 
+              <Link to={"/movie/" + item.id}>Detail</Link>
               </span>
             </div>
           </div>
@@ -27,27 +50,25 @@ export function Movies(props) {
       )
     })
 
-    const genre = pageData.map(( item, key ) => {
-      const mySet = new Set([
-        item.genre
-      ]);
-      // item.genre.map(( i ) => {
+    const genre = filterData.map((item, key) => {
       return (
         <div className="col-md-4" key={key}>
-          {mySet}
+          <Link to={"?genre=" + item} className="filter-link">{item}</Link>
         </div>
       )
     })
 
     return (
       <div className="container my-4">
-       
         <h1> All Movies </h1>
         <div className="row">
           <div className='col-2 filter-section'>
-            <h3>Filters</h3>
+            <h3>Filter</h3>
+            
+            <h5>Genre <Link to="/movies" className="filter-link-clear">Clear All</Link></h5>
             {genre}
-          </div> 
+            
+          </div>
           <div className='col-8'>
           <div className="row">
                 {itemCollection}

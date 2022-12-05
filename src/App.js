@@ -103,6 +103,7 @@ function App() {
   const [rightNav, setRightNav] = useState(RightNavData)
   const [leftNav, setLeftNav] = useState(LeftNavData)
   const [data, setData] = useState([])
+  const [filterData, setFilterData] = useState([])
 
   useEffect(() => {
     if (data.length == 0) {
@@ -138,26 +139,42 @@ function App() {
       dbItems.push(item)
     })
     setData(dbItems)
-    
+
+
+    const filterItems = []
+    collectionData.forEach((doc) => {
+      const item = doc.data()
+      if(item.genre){
+        item.genre.forEach((g) => {
+          if (g) {
+            if(!filterItems.includes(g)){
+              filterItems.push(g)
+            }
+          }
+        })
+      }
+    })
+
+    setFilterData(filterItems);
     // return dbItems
   }
 
-  
-//db.collection("app").document("users").collection(uid).document("notifications")
+
+  //db.collection("app").document("users").collection(uid).document("notifications")
 
   const getDocument = async (col, id) => {
 
     const docRef = doc(FBdb, col, id)
     const docData = await getDoc(docRef)
     if (docData.exists()) {
-    const collectionData = await getDocs(collection(FBdb, `movies/${id}/reviews`))
-    let dbItems = []
-    let movieData = docData.data();
-    collectionData.forEach((doc) => {
-      let item = doc.data()
-      item.id = doc.id
-      dbItems.push(item)
-    })
+      const collectionData = await getDocs(collection(FBdb, `movies/${id}/reviews`))
+      let dbItems = []
+      let movieData = docData.data();
+      collectionData.forEach((doc) => {
+        let item = doc.data()
+        item.id = doc.id
+        dbItems.push(item)
+      })
       movieData.reviews = dbItems;
       console.log(movieData)
       return movieData
@@ -172,7 +189,7 @@ function App() {
       <Header title="BRAND" rightnav={rightNav} leftnav={leftNav} />
       <Routes>
         <Route path="/" element={<Home listData={data} />} />
-        <Route path="/movies" element={<Movies listData={data} />} />
+        <Route path="/movies" element={<Movies listData={data} filterData={filterData} />} />
 
         <Route path="/signup" element={<Signup handler={signup} />} />
         <Route path="/signout" element={<Signout handler={signoutuser} auth={auth} />} />
