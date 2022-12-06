@@ -52,8 +52,8 @@ export function Movies(props) {
 
     const genre = filterData.map((item, key) => {
       return (
-        <div className="col-md-4" key={key}>
-          <Link to={"?genre=" + item} className="filter-link">{item}</Link>
+        <div key={key}>
+         <li className={item == searchParams.get('genre')?'filter-selected-item':''}> <Link to={"?genre=" + item} className="filter-link">{item}</Link></li>
         </div>
       )
     })
@@ -66,8 +66,9 @@ export function Movies(props) {
             <h3>Filter</h3>
             
             <h5>Genre <Link to="/movies" className="filter-link-clear">Clear All</Link></h5>
+            <ul className='filter-section-list'>
             {genre}
-            
+            </ul>
           </div>
           <div className='col-8'>
           <div className="row">
