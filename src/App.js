@@ -1,55 +1,48 @@
-import { useState, useEffect } from 'react'
-import './App.css';
-import { Header } from './components/Header'
-import { Footer } from './components/Footer'
+import { useState, useEffect } from "react";
+import "./App.css";
+import { Header } from "./components/Header";
+import { Footer } from "./components/Footer";
 
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route } from "react-router-dom";
 
 // import page components
-import { Home } from './pages/Home'
+import { Home } from "./pages/Home";
 
-import { Signup } from './pages/Signup'
-import { Signout } from './pages/Signout'
-import { Signin } from './pages/Signin'
-import { Details } from './pages/Details'
+import { Signup } from "./pages/Signup";
+import { Signout } from "./pages/Signout";
+import { Signin } from "./pages/Signin";
+import { Details } from "./pages/Details";
 
 //updates DW
-import { Experiences } from './pages/Experiences'
-import { Deals } from './pages/Deals'
-import { Cinema } from './pages/Cinema'
-import { Cart } from './pages/Cart'
-
-
+import { Experiences } from "./pages/Experiences";
+import { Deals } from "./pages/Deals";
+import { Cinema } from "./pages/Cinema";
+import { Cart } from "./pages/Cart";
 
 // import firebase
-import { initializeApp } from "firebase/app"
-import { FirebaseConfig } from './config/FirebaseConfig'
+import { initializeApp } from "firebase/app";
+import { FirebaseConfig } from "./config/FirebaseConfig";
 // import firebase firestore
-import {
-  getFirestore,
-  getDocs,
-  collection,
-  doc,
-  getDoc
-} from "firebase/firestore";
-// import firebase auth 
+import { getFirestore, getDocs, collection, doc, getDoc } from "firebase/firestore";
+// import firebase auth
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   onAuthStateChanged,
-  signOut
-}
-  from "firebase/auth"
-import { Movies } from './pages/Movies';
+  signOut,
+} from "firebase/auth";
+
+import { Movies } from "./pages/Movies";
+import { useRecoilState, useSetRecoilState } from 'recoil'
+import { moviesAtom, genresAtom, filteredAtom } from './states/movies'
 
 // initialise Firebase
-const FBapp = initializeApp(FirebaseConfig)
+const FBapp = initializeApp(FirebaseConfig);
 // initialise Firebase Auth
-const FBauth = getAuth(FBapp)
+const FBauth = getAuth(FBapp);
 // initialise FireStore Database
-const FBdb = getFirestore(FBapp)
-
+const FBdb = getFirestore(FBapp);
 
 // function to create user account
 const signup = (email, password) => {
@@ -58,138 +51,135 @@ const signup = (email, password) => {
       .then((userCredential) => resolve(userCredential.user))
       .catch((error) => {
         // console.log(error)
-        reject(error)
-      })
-  })
-}
+        reject(error);
+      });
+  });
+};
 
 const signin = (email, password) => {
   return new Promise((resolve, reject) => {
     signInWithEmailAndPassword(FBauth, email, password)
       .then((userCredential) => resolve(userCredential.user))
-      .catch((error) => reject(error))
-  })
-}
+      .catch((error) => reject(error));
+  });
+};
 
 const signoutuser = () => {
   return new Promise((resolve, reject) => {
     signOut(FBauth)
       .then(() => resolve(true))
-      .catch((error) => reject(error))
-  })
-
-}
+      .catch((error) => reject(error));
+  });
+};
 
 const RightNavData = [
   { name: "Cinema", path: "/cinema", icon: "fa-solid fa-map-location-dot", public: true },
   { name: "Cart", path: "/cart", icon: "fa-solid fa-cart-shopping", public: true },
-  { name: "Sign In", path: "/signin", icon: "fa-solid fa-user", public: true }
-]
+  { name: "Sign In", path: "/signin", icon: "fa-solid fa-user", public: true },
+];
 
 const LeftNavData = [
   { name: "Movies", path: "/Movies", public: true },
   { name: "Experiences", path: "/experiences", public: true },
-  { name: "Deals", path: "/deals", public: true }
-]
+  { name: "Deals", path: "/deals", public: true },
+];
 
 const NavDataAuth = [
   { name: "Cinema", path: "/cinema", icon: "fa-solid fa-map-location-dot", public: true },
   { name: "Cart", path: "/cart", icon: "fa-solid fa-cart-shopping", public: true },
-  { name: "Sign Out", path: "/signout", icon: "fa-solid fa-user", public: true }
-]
+  { name: "Sign Out", path: "/signout", icon: "fa-solid fa-user", public: true },
+];
 
 function App() {
-  const [auth, setAuth] = useState()
-  const [rightNav, setRightNav] = useState(RightNavData)
-  const [leftNav, setLeftNav] = useState(LeftNavData)
-  const [data, setData] = useState([])
-  const [filterData, setFilterData] = useState([])
+  const [auth, setAuth] = useState();
+  const [rightNav, setRightNav] = useState(RightNavData);
+  const [leftNav, setLeftNav] = useState(LeftNavData);
+  // const [data, setData] = useState([]);
+  // const [filterData, setFilterData] = useState([]);
+
+  const setMovies = useSetRecoilState(moviesAtom)
+  const setFiltered = useSetRecoilState(filteredAtom)
+  const setGenres = useSetRecoilState(genresAtom)
 
   useEffect(() => {
-    if (data.length == 0) {
-      getDataCollection('movies')
-    }
-  })
+    getDataCollection("movies");
+  }, []);
 
   // an observer to determine user's authentication status
   onAuthStateChanged(FBauth, (user) => {
     if (user) {
       // visitor is authenticated
       // console.log(user)
-      setAuth(user)
-      setLeftNav(LeftNavData)
-      setRightNav(NavDataAuth)
-    }
-    else {
+      setAuth(user);
+      setLeftNav(LeftNavData);
+      setRightNav(NavDataAuth);
+    } else {
       // if user is null means visitor is not authenticated
       // console.log('not signed in')
-      setAuth(null)
-      setLeftNav(LeftNavData)
-      setRightNav(RightNavData)
+      setAuth(null);
+      setLeftNav(LeftNavData);
+      setRightNav(RightNavData);
     }
-  })
+  });
 
   const getDataCollection = async (path) => {
-    const collectionData = await getDocs(collection(FBdb, path))
+    const collectionData = await getDocs(collection(FBdb, path));
 
-    let dbItems = []
+    let dbItems = [];
     collectionData.forEach((doc) => {
-      let item = doc.data()
-      item.id = doc.id
-      dbItems.push(item)
-    })
-    setData(dbItems)
+      let item = doc.data();
+      item.id = doc.id;
+      dbItems.push(item);
+    });
+    setMovies(dbItems)
+    setFiltered(dbItems)
 
-
-    const filterItems = []
+    const filterItems = [];
     collectionData.forEach((doc) => {
-      const item = doc.data()
-      if(item.genre){
+      const item = doc.data();
+      if (item.genre) {
         item.genre.forEach((g) => {
           if (g) {
-            if(!filterItems.includes(g)){
-              filterItems.push(g)
+            if (!filterItems.includes(g)) {
+              filterItems.push(g);
             }
           }
-        })
+        });
       }
-    })
+    });
 
-    setFilterData(filterItems);
+    setGenres(filterItems)
     // return dbItems
-  }
-
+  };
 
   //db.collection("app").document("users").collection(uid).document("notifications")
 
   const getDocument = async (col, id) => {
-
-    const docRef = doc(FBdb, col, id)
-    const docData = await getDoc(docRef)
+    const docRef = doc(FBdb, col, id);
+    const docData = await getDoc(docRef);
     if (docData.exists()) {
-      const collectionData = await getDocs(collection(FBdb, `movies/${id}/reviews`))
-      let dbItems = []
+      const collectionData = await getDocs(collection(FBdb, `movies/${id}/reviews`));
+      let dbItems = [];
       let movieData = docData.data();
       collectionData.forEach((doc) => {
-        let item = doc.data()
-        item.id = doc.id
-        dbItems.push(item)
-      })
+        let item = doc.data();
+        item.id = doc.id;
+        dbItems.push(item);
+      });
       movieData.reviews = dbItems;
-      console.log(movieData)
-      return movieData
+      console.log(movieData);
+      return movieData;
+    } else {
+      return null;
     }
-    else {
-      return null
-    }
-  }
+  };
 
   return (
     <div className="App">
       <Header title="BRAND" rightnav={rightNav} leftnav={leftNav} />
       <Routes>
-        <Route path="/" element={<Home listData={data} />} />
-        <Route path="/movies" element={<Movies listData={data} filterData={filterData} />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/movies" element={<Movies />} />
 
         <Route path="/signup" element={<Signup handler={signup} />} />
         <Route path="/signout" element={<Signout handler={signoutuser} auth={auth} />} />
