@@ -12,6 +12,7 @@ import { Signup } from "./pages/Signup";
 import { Signout } from "./pages/Signout";
 import { Signin } from "./pages/Signin";
 import { Details } from "./pages/Details";
+import { Profile } from "./pages/Profile";
 
 //updates DW
 import { Experiences } from "./pages/Experiences";
@@ -31,11 +32,13 @@ import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
+  updatePassword,
+  updateEmail,
 } from "firebase/auth";
 
 import { Movies } from "./pages/Movies";
-import { useRecoilState, useSetRecoilState } from 'recoil'
-import { moviesAtom, genresAtom, filteredAtom } from './states/movies'
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { moviesAtom, genresAtom, filteredAtom } from "./states/movies";
 
 // initialise Firebase
 const FBapp = initializeApp(FirebaseConfig);
@@ -72,6 +75,23 @@ const signoutuser = () => {
   });
 };
 
+const updateUserEmail = (user, email) => {
+  return new Promise((resolve, reject) => {
+    updateEmail(user, email)
+      .then((r) => {
+        resolve(true);
+      })
+      .catch((err) => reject(err));
+  });
+};
+const updateUserPassword = (user, pwd) => {
+  return new Promise((resolve, reject) => {
+    updatePassword(user, pwd)
+      .then(() => resolve(true))
+      .catch((err) => reject(err));
+  });
+};
+
 const RightNavData = [
   { name: "Cinema", path: "/cinema", icon: "fa-solid fa-map-location-dot", public: true },
   { name: "Cart", path: "/cart", icon: "fa-solid fa-cart-shopping", public: true },
@@ -87,6 +107,7 @@ const LeftNavData = [
 const NavDataAuth = [
   { name: "Cinema", path: "/cinema", icon: "fa-solid fa-map-location-dot", public: true },
   { name: "Cart", path: "/cart", icon: "fa-solid fa-cart-shopping", public: true },
+  { name: "Profile", path: "/profile", icon: "fa-solid fa-user", public: true },
   { name: "Sign Out", path: "/signout", icon: "fa-solid fa-user", public: true },
 ];
 
@@ -97,9 +118,9 @@ function App() {
   // const [data, setData] = useState([]);
   // const [filterData, setFilterData] = useState([]);
 
-  const setMovies = useSetRecoilState(moviesAtom)
-  const setFiltered = useSetRecoilState(filteredAtom)
-  const setGenres = useSetRecoilState(genresAtom)
+  const setMovies = useSetRecoilState(moviesAtom);
+  const setFiltered = useSetRecoilState(filteredAtom);
+  const setGenres = useSetRecoilState(genresAtom);
 
   useEffect(() => {
     getDataCollection("movies");
@@ -131,8 +152,8 @@ function App() {
       item.id = doc.id;
       dbItems.push(item);
     });
-    setMovies(dbItems)
-    setFiltered(dbItems)
+    setMovies(dbItems);
+    setFiltered(dbItems);
 
     const filterItems = [];
     collectionData.forEach((doc) => {
@@ -148,7 +169,7 @@ function App() {
       }
     });
 
-    setGenres(filterItems)
+    setGenres(filterItems);
     // return dbItems
   };
 
@@ -167,7 +188,6 @@ function App() {
         dbItems.push(item);
       });
       movieData.reviews = dbItems;
-      console.log(movieData);
       return movieData;
     } else {
       return null;
@@ -184,6 +204,16 @@ function App() {
         <Route path="/signup" element={<Signup handler={signup} />} />
         <Route path="/signout" element={<Signout handler={signoutuser} auth={auth} />} />
         <Route path="/signin" element={<Signin handler={signin} />} />
+        <Route
+          path="/profile"
+          element={
+            <Profile
+              auth={auth}
+              updateEmail={updateUserEmail}
+              updatePassword={updateUserPassword}
+            />
+          }
+        />
         <Route path="/movie/:movieId" element={<Details getter={getDocument} />} />
         <Route path="/experiences" element={<Experiences />} />
         <Route path="/deals" element={<Deals />} />
