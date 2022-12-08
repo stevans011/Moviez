@@ -26,3 +26,51 @@ code {
   width: 100%;
   padding-bottom: 30px;
 }
+
+
+.rating-wrapper {
+  max-width: 100%;
+  width: 700px;
+  display: flex;
+  gap: 2;
+}
+
+.rating-wrapper h2 {
+  font-size: 4rem;
+}
+
+.rating-wrapper .rate-progress {
+  width: 100%;
+  height: 18px;
+  border-radius: 16px;
+  background-color: #c9c9c9;
+  margin-left: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.rating-wrapper .rate-step {
+  height: 18px;
+  left: 0;
+  top: 0;
+  background-color: #dc3545;
+  border-radius: 16px;
+}
+
+.rating-wrapper .rate-star-wrapper {
+  position: relative;
+  width: 150px;
+  height: 25px;
+}
+
+.rating-wrapper .star-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+}
+
+.rating-wrapper .star-wrapper img {
+  width: 150px;
+}
+
