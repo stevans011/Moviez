@@ -24,21 +24,20 @@ import { Cart } from "./pages/Cart";
 import { initializeApp } from "firebase/app";
 import { FirebaseConfig } from "./config/FirebaseConfig";
 // import firebase firestore
-import { getFirestore, getDocs, collection, doc, getDoc } from "firebase/firestore";
+import { getFirestore, getDocs, collection, doc, getDoc, addDoc, query, where, deleteDoc } from "firebase/firestore";
 // import firebase auth
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateEmail,
+  updatePassword,
   onAuthStateChanged,
   signOut,
-  updatePassword,
-  updateEmail,
 } from "firebase/auth";
-
 import { Movies } from "./pages/Movies";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { moviesAtom, genresAtom, filteredAtom } from "./states/movies";
+import { favoritesAtom, filteredAtom, genresAtom, moviesAtom } from "./states/movies";
 
 // initialise Firebase
 const FBapp = initializeApp(FirebaseConfig);
@@ -115,16 +114,20 @@ function App() {
   const [auth, setAuth] = useState();
   const [rightNav, setRightNav] = useState(RightNavData);
   const [leftNav, setLeftNav] = useState(LeftNavData);
-  // const [data, setData] = useState([]);
-  // const [filterData, setFilterData] = useState([]);
-
   const setMovies = useSetRecoilState(moviesAtom);
   const setFiltered = useSetRecoilState(filteredAtom);
   const setGenres = useSetRecoilState(genresAtom);
+  const [favorites, setFavorites] = useRecoilState(favoritesAtom);
 
   useEffect(() => {
     getDataCollection("movies");
   }, []);
+
+  useEffect(() => {
+    if (auth) {
+      getFavorites();
+    }
+  }, [auth]);
 
   // an observer to determine user's authentication status
   onAuthStateChanged(FBauth, (user) => {
@@ -152,6 +155,7 @@ function App() {
       item.id = doc.id;
       dbItems.push(item);
     });
+
     setMovies(dbItems);
     setFiltered(dbItems);
 
@@ -170,7 +174,19 @@ function App() {
     });
 
     setGenres(filterItems);
-    // return dbItems
+  };
+
+  const getFavorites = async () => {
+    const collectionData = await getDocs(query(collection(FBdb, "favorites"), where("userId", "==", auth.uid)));
+    let dbItems = [];
+    collectionData.forEach((doc) => {
+      dbItems.push({
+        id: doc.id,
+        ...doc.data(),
+      });
+    });
+
+    setFavorites(dbItems);
   };
 
   //db.collection("app").document("users").collection(uid).document("notifications")
@@ -194,6 +210,47 @@ function App() {
     }
   };
 
+  const handleFavorite = async (user, movieId) => {
+    return new Promise((resolve, reject) => {
+      addDoc(collection(FBdb, "favorites"), {
+        movieId,
+        userId: user.uid,
+      })
+        .then((docRef) => {
+          // update favorites
+          const updated = [
+            ...favorites,
+            {
+              movieId,
+              userId: user.uid,
+              id: docRef.id,
+            },
+          ];
+          setFavorites(updated);
+          resolve(true);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+  };
+
+  const handleRemoveFavorite = async (id) => {
+    return new Promise((resolve, reject) => {
+      deleteDoc(doc(FBdb, "favorites", id))
+        .then((r) => {
+          const idx = favorites.findIndex((f) => f.id === id);
+          const updated = [...favorites];
+          updated.splice(idx, 1);
+          setFavorites(updated);
+          resolve(true);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+  };
+
   return (
     <div className="App">
       <Header title="BRAND" rightnav={rightNav} leftnav={leftNav} />
@@ -211,10 +268,14 @@ function App() {
               auth={auth}
               updateEmail={updateUserEmail}
               updatePassword={updateUserPassword}
+              removeFavorite={handleRemoveFavorite}
             />
           }
         />
-        <Route path="/movie/:movieId" element={<Details getter={getDocument} />} />
+        <Route
+          path="/movie/:movieId"
+          element={<Details getter={getDocument} onFavorite={handleFavorite} auth={auth} />}
+        />
         <Route path="/experiences" element={<Experiences />} />
         <Route path="/deals" element={<Deals />} />
         <Route path="/cinema" element={<Cinema />} />

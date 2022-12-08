@@ -1,11 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
+import { Link } from "react-router-dom";
+import { favoritesAtom, moviesAtom } from "../states/movies";
 
 export function Profile(props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [updating, setUpdating] = useState(false);
+  const [pageData, setPageData] = useState([]);
   const [error, setError] = useState("");
+  const movies = useRecoilValue(moviesAtom);
+  const favorites = useRecoilValue(favoritesAtom);
+
+  useEffect(() => {
+    const items = favorites.map((f) => {
+      const m = movies.find((m) => m.id === f.movieId);
+      return {
+        ...m,
+        favId: f.id,
+      };
+    });
+    setPageData(items);
+  }, [movies, favorites]);
 
   const handleEmail = () => {
     if (updating) return;
@@ -43,6 +60,18 @@ export function Profile(props) {
       });
   };
 
+  const handleRemoveFavorite = (id) => {
+    if (updating) return;
+    setUpdating(true);
+    props
+      .removeFavorite(id)
+      .then(() => {})
+      .catch((err) => {})
+      .finally(() => {
+        setUpdating(false);
+      });
+  };
+
   return (
     <div className="container">
       <div className="row">
@@ -53,11 +82,12 @@ export function Profile(props) {
             <label htmlFor="email">Current Email</label>
             <input
               type="email"
-              id="original_email"
-              name="original_email"
+              id="email"
+              name="email"
               placeholder="you@domain.com"
               className="form-control"
-              value={props?.auth?.email || ''}
+              defaultValue={props?.auth?.email || ""}
+              value={props?.auth?.email || ""}
               disabled
             />
           </div>
@@ -107,6 +137,28 @@ export function Profile(props) {
               {updating ? "Updating" : "Update password"}
             </button>
           </div>
+        </div>
+      </div>
+      <hr />
+      <div className="row">
+        <h2 className="text-center mt-2">Favorite movies</h2>
+        <div className="row mt-4">
+          {pageData.map((item, key) => (
+            <div className="col-md-4" key={key}>
+              <div className="card-body text-center shadow p-3 mb-5 bg-body rounded">
+                <img className="rounded" src={item.ImageUrl} height="250px" alt={item.Title} />
+                <h5 className="card-title mt-2">{item.Title}</h5>
+                <span className="text-secondary">
+                  <Link to={"/movie/" + item.id}>Detail</Link>
+                </span>
+                <div className="mt-2">
+                  <button className="btn btn-warning" onClick={() => handleRemoveFavorite(item.favId)}>
+                    {updating ? "Updating" : "Remove favorite"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

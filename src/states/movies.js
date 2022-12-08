@@ -21,4 +21,10 @@ const genresAtom = atom({
   effects_UNSTABLE: [persistAtom],
 });
 
-export { moviesAtom, filteredAtom, genresAtom };
+const favoritesAtom = atom({
+  key: "favorites",
+  default: [],
+  effects_UNSTABLE: [persistAtom],
+});
+
+export { moviesAtom, filteredAtom, favoritesAtom, genresAtom };
